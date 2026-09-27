@@ -1,0 +1,13 @@
+.venv
+data/raw
+training
+tests
+node_modules
+.next
+.env*
+*.tsbuildinfo
+deployment-inputs.json
+/*.csv
+data/private
+data/catalog-extra.json
+afis

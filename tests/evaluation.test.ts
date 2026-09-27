@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {ratingGain,gradedMetrics} from '../lib/evaluation';
+import {parseImdbCsv,normalizeRatingDate} from '../lib/imdb-csv';
+import {getModel,recommend} from '../lib/engine';
+test('6, 7 and 8 ratings all contribute with graded strength',()=>{assert.deepEqual([5,6,7,8,9,10].map(ratingGain),[0,.2,.4,.6,.8,1]);assert.throws(()=>ratingGain(NaN));});
+test('graded NDCG favors highly rated films first while counting 6–8 hits',()=>{const target=new Map([['a',6],['b',8],['c',10]]),eligible=new Set(target.keys());const perfect=gradedMetrics(['c','b','a'],target,eligible,3),reverse=gradedMetrics(['a','b','c'],target,eligible,3);assert.equal(perfect.ndcg10,1);assert.equal(perfect.hits,3);assert.ok(reverse.ndcg10<1);});
+test('legacy IMDb export parses personal rating and legacy dates',()=>{const p=parseImdbCsv('const,You rated,Title type,created\ntt2872718,6,Feature Film,Sat Dec 31 00:00:00 2016\ntt1260502,7,Documentary,Fri Dec 30 00:00:00 2016');assert.deepEqual(p.ratings.map(x=>x.rating),[3,3.5]);assert.equal(normalizeRatingDate('Sat Dec 31 00:00:00 2016'),'2016-12-31');});
+test('six-rated film alone is a usable preference seed',()=>{assert.equal(recommend([[0,3]],getModel()).length,12);});
+test('recent cold-start movies are eligible and can seed recommendations',()=>{const m=getModel();assert.equal(m.version,2);const recent=m.movies.map((x,i)=>({x,i})).filter(({x,i})=>Number(x.title.match(/\((\d{4})\)$/)?.[1])>2018&&m.eligible[i]);assert.ok(recent.length>=100);const seed=recent[0].i;const result=recommend([[seed,4]],m,100);assert.ok(result.some(x=>Number(x.year)>2018));assert.ok(result.every(x=>x.id!==m.movies[seed].id));});

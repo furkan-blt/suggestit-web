@@ -1,0 +1,28 @@
+{
+  "name": "film-atlasi",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "graph:metadata": "tsx scripts/build-graph-meta.ts",
+    "tmdb:check": "node --env-file=.env.local --import tsx scripts/check-tmdb.ts"
+  },
+  "dependencies": {
+    "csv-parse": "^7.0.2",
+    "fast-xml-parser": "^5.3.0",
+    "next": "16.3.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tsx": "^4.20.0",
+    "typescript": "^5"
+  }
+}
